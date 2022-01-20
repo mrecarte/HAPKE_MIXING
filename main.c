@@ -6,6 +6,33 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image/stb_image_write.h"
 
+//functions to move pointer left, right, up, down
+unsigned char moveLeft(unsigned char *p, int channels) {
+    p += channels;
+    //returns color
+    return p+1;
+}
+
+unsigned char moveRight(unsigned char *p, int channels) {
+    p -= channels;
+    return p+1;
+}
+
+unsigned char moveUp(unsigned char *p, int channels, int width) {
+    p -= width*channels;
+    return p+1;
+}
+
+unsigned char moveDown(unsigned char *p, int channels, int width) {
+    p += width*channels;
+    return p+1;
+}
+
+//places p at the x, y position from p's starting point
+void getPosition(unsigned char*p, int channels, int height, int width, int x, int y) {
+    p = p + y*channels*width*channels + x*channels;
+}
+
 int main(int argc, char *argv[]) {
 
 		// load image using the stb_image library 
@@ -38,6 +65,39 @@ int main(int argc, char *argv[]) {
 
     stbi_write_jpg("grayed.jpg", width, height, gray_channels, gray_img, 100);
 
+    img = gray_img;
+
+    int THRESHOLD = 10;
+    int EYE1_X = 0;
+    int EYE1_Y = 0;
+    int EYE2_X = 0;
+    int EYE2_Y = 0;
+    int MOUTH_X = 0;
+    int MOUTH_Y = 0;
+
+    unsigned char *eye1p = malloc(gray_channels);
+    unsigned char *eye2p = malloc(gray_channels);
+    unsigned char *mouthp = malloc(gray_channels);
+    
+    int eye1size = 1;
+    int eye2size = 1;
+    int mouthsize = 1;
+
+    //set initial position of eye1p, eye2p, and mouthp
+    unsigned char* temp = img;
+    getPosition(temp, gray_channels, height, width, EYE1_X, EYE1_Y);
+    eye1p = temp;
+
+    temp = img;
+    getPosition(temp, gray_channels, height, width, EYE2_X, EYE2_Y);
+    eye2p = temp;
+
+    temp = img;
+    getPosition(temp, gray_channels, height, width, MOUTH_X, MOUTH_Y);
+    mouthp = temp;
+
     stbi_image_free(img);
     free(gray_img);
+
+
 }
